@@ -41,7 +41,7 @@ public interface CatApi {
 
     @Headers("x-api-key: 9442c6b9-5419-424f-9a41-1fb096fe582d")
     @DELETE("votes/{vote_id}")
-    Call<Void> delVote(@Path("vote_id") int vote_id
+    Call<Void> delVote(@Path("vote_id") String vote_id
     );
 
     @Headers("x-api-key: 9442c6b9-5419-424f-9a41-1fb096fe582d")

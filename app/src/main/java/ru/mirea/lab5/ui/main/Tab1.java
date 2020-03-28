@@ -92,7 +92,6 @@ public class Tab1 extends Fragment {
             @Override
             public void onResponse(retrofit2.Call<List<PhotoDTO>> call, retrofit2.Response<List<PhotoDTO>> response) {
                 if (response.isSuccessful()) {
-                    System.out.println("РООООбит");
                     Log.d("daniel", "onResponse " + response.body());
                     List<PhotoDTO> responseData = response.body();
                     Headers headers = response.headers();
@@ -106,7 +105,6 @@ public class Tab1 extends Fragment {
 
             @Override
             public void onFailure(retrofit2.Call<List<PhotoDTO>> call, Throwable t) {
-                System.out.println("РООООбит");
                 t.printStackTrace();
             }
         });
@@ -191,7 +189,6 @@ public class Tab1 extends Fragment {
                     for (int i = 0; i < breeds.size(); i++) {
                         if (breeds.get(i).getBreed().equals(selectStringName)) {
                             PhotoDTO.breeds_id = breeds.get(i).getId();
-                            System.out.println(PhotoDTO.breeds_id);
                             break;
                         }
                     }

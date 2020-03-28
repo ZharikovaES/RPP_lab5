@@ -13,7 +13,7 @@ public class PhotoDTO {
     public static String breeds_id = "";
     private int isLike = -1;
 
-    private int id;
+    private int iid;
 
     @SerializedName("url")
     @Expose
@@ -33,10 +33,10 @@ public class PhotoDTO {
     }
 
     public String getImageId() {
+        System.out.println(imageUrl);
         int pos1 = imageUrl.lastIndexOf("/");
         int pos2 = imageUrl.lastIndexOf(".");
         String s = imageUrl.substring(pos1 + 1, pos2);
-        System.out.println(imageUrl);
         return s;
     }
 
@@ -49,10 +49,10 @@ public class PhotoDTO {
     }
 
     public int getId() {
-        return id;
+        return iid;
     }
 
     public void setId(int id) {
-        this.id = id;
+        this.iid = id;
     }
 }

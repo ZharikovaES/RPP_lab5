@@ -60,11 +60,11 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                         for (int j = 0; j < arrayPostFavourites.size(); j++) {
                             if (list.get(i).getImageId().equals(arrayPostFavourites.get(j).getImageId())) {
                                 list.get(i).setLike(arrayPostFavourites.get(j).getValue());
+                                System.out.println("Есть контакт");
                             }
                         }
                     }
                 }
-                System.out.println("ОШИБКа");
             }
 
             @Override
@@ -89,10 +89,9 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
 
     @Override
     public void onBindViewHolder(@NonNull final ItemViewHolder holder, final int position) {
-        final PhotoDTO currentItem = list.get(position);
         viewHolder = (ItemViewHolder) holder;
 
-        String imageUrl = currentItem.getImageUrl();
+        String imageUrl = list.get(position).getImageUrl();
         Glide.with(context)
                 .load(imageUrl)
                 .centerCrop()
@@ -104,13 +103,13 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                 list.get(position).setLike(arrayPostFavourites.get(j).getValue());
             }
         }
-        final PostCreate postCreate = new PostCreate(MainActivity.USER_ID, currentItem.getImageId());
+        final PostCreate postCreate = new PostCreate(MainActivity.USER_ID, list.get(position).getImageId());
 
         holder.imageButton_like.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // меняем изображение на кнопке
-                if (currentItem.isLike() == -1 || currentItem.isLike() == 0) {
-                    currentItem.setLike(1);
+                if (list.get(position).isLike() == -1 || list.get(position).isLike() == 0) {
+                    list.get(position).setLike(1);
 //                    Log.d("daniel", "onResponse " + currentItem.getUrl());
                     postCreate.setValue(1);
                     Call<Vote> call = api.setPostFavourites(postCreate);
@@ -131,10 +130,11 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                             t.printStackTrace();
                         }
                     });
-                } else {
-                    currentItem.setLike(-1);
+                }
+                 else if (list.get(position).isLike() == 1) {
+                    list.get(position).setLike(-1);
                     postCreate.setValue(-1);
-                    Call<Void> call = api.delVote(currentItem.getId());
+                    Call<Void> call = api.delVote(Integer.toString(list.get(position).getId()));
                     call.enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
@@ -155,8 +155,8 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
         holder.imageButton_dislike.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 // меняем изображение на кнопке
-                if (currentItem.isLike() == -1 || currentItem.isLike() == 1) {
-                    currentItem.setLike(0);
+                if (list.get(position).isLike() == -1 || list.get(position).isLike() == 1) {
+                    list.get(position).setLike(0);
 //                    Log.d("daniel", "onResponse " + currentItem.getUrl());
                     postCreate.setValue(0);
                     Call<Vote> call = api.setPostFavourites(postCreate);
@@ -164,8 +164,7 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                         @Override
                         public void onResponse(Call<Vote> call, Response<Vote> response) {
                             if (response.isSuccessful()) {
-                                System.out.println("Дизлайк отправлен!!! " + response.code() +
-                                        Integer.toString(response.body().getVote_id()));
+                                System.out.println("Дизлайк отправлен!!! " + response.code() + response.body().getVote_id());
                                 Toast.makeText(context, "Дизлайк поставлен", Toast.LENGTH_SHORT).show();
                                 list.get(position).setId(response.body().getVote_id());
                             }
@@ -176,11 +175,12 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                             t.printStackTrace();
                         }
                     });
-                } else {
+                }
+                else if (list.get(position).isLike() == 0) {
                     // возвращаем первую картинку
-                    currentItem.setLike(-1);
+                    list.get(position).setLike(-1);
                     postCreate.setValue(-1);
-                    Call<Void> call = api.delVote(currentItem.getId());
+                    Call<Void> call = api.delVote(Integer.toString(list.get(position).getId()));
                     call.enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
