@@ -6,6 +6,7 @@
     tools:context=".ui.main.Tab2">
 
     <TextView
+        android:id="@+id/tab2_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="@dimen/appbar_padding"
@@ -13,5 +14,13 @@
         android:textSize="20sp"
         android:text="@string/last_like"
         />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id='@+id/tab2_recycle_view'
+        android:layout_width="match_parent"
+        android:layout_height="640dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
+
 
 </RelativeLayout>

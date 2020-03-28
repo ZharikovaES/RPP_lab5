@@ -11,11 +11,18 @@ public class PhotoDTO {
     public static Double limit = 0.0;
     private static int pageCount = 1;
     public static String breeds_id = "";
-    private boolean isLike = true;
+    private int isLike = -1;
+
+    private int id;
 
     @SerializedName("url")
     @Expose
     private String imageUrl;
+
+    public PhotoDTO(String imageUrl, int isLike) {
+        this.imageUrl = imageUrl;
+        this.isLike = isLike;
+    }
 
     public String getImageUrl() {
         return imageUrl;
@@ -25,17 +32,27 @@ public class PhotoDTO {
         return pageCount;
     }
 
-    public String getUrl() {
+    public String getImageId() {
         int pos1 = imageUrl.lastIndexOf("/");
         int pos2 = imageUrl.lastIndexOf(".");
-        return imageUrl.substring(pos1 + 1, pos2);
+        String s = imageUrl.substring(pos1 + 1, pos2);
+        System.out.println(imageUrl);
+        return s;
     }
 
-    public boolean isLike() {
+    public int isLike() {
         return isLike;
     }
 
-    public void setLike(boolean like) {
+    public void setLike(int like) {
         isLike = like;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">lab5</string>
     <string name="tab_text_1">Фото по породе</string>
-    <string name="tab_text_2">Понравившиеся</string>
+    <string name="tab_text_2">Понравившихся фото и видео пока нет</string>
     <string name="last_like">Последние понравившиеся фото</string>
     <string name="breeds">Породы</string>
 

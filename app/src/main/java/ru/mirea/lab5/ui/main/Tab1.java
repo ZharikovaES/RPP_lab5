@@ -8,7 +8,6 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,14 +20,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import okhttp3.Headers;
-import okhttp3.Request;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.http.Header;
+import ru.mirea.lab5.MainActivity;
 import ru.mirea.lab5.R;
 import ru.mirea.lab5.api.CatApi;
 import ru.mirea.lab5.api.model.BreedDTO;
@@ -43,8 +40,7 @@ import static android.view.View.VISIBLE;
 public class Tab1 extends Fragment {
     private TextView selection;
     private Spinner spinner;
-    private Adapter adapter;
-    public final static String URL = "https://api.thecatapi.com/v1/";
+    private AdapterBreed adapterBreed;
     private String selectStringName;
     private RecyclerView recyclerView;
     private Retrofit retrofit;
@@ -88,7 +84,7 @@ public class Tab1 extends Fragment {
         recyclerView.setLayoutManager(layoutManager);
         PhotoDTO.limit = Double.valueOf(item_count);
         retrofit = new Retrofit.Builder()
-                .baseUrl(URL)
+                .baseUrl(MainActivity.URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         CatApi api = retrofit.create(CatApi.class);
@@ -96,20 +92,21 @@ public class Tab1 extends Fragment {
             @Override
             public void onResponse(retrofit2.Call<List<PhotoDTO>> call, retrofit2.Response<List<PhotoDTO>> response) {
                 if (response.isSuccessful()) {
+                    System.out.println("РООООбит");
                     Log.d("daniel", "onResponse " + response.body());
                     List<PhotoDTO> responseData = response.body();
                     Headers headers = response.headers();
-                    System.out.println("HH" + headers);
                     PhotoDTO.imagesCount = Double.parseDouble(headers.get("pagination-count"));
                     photos.addAll(responseData);
-                    adapter = new Adapter(getActivity(), recyclerView, photos);
-                    recyclerView.setAdapter(adapter);
+                    adapterBreed = new AdapterBreed(getActivity(), photos);
+                    recyclerView.setAdapter(adapterBreed);
                     recyclerView.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
             public void onFailure(retrofit2.Call<List<PhotoDTO>> call, Throwable t) {
+                System.out.println("РООООбит");
                 t.printStackTrace();
             }
         });
@@ -140,7 +137,7 @@ public class Tab1 extends Fragment {
     private void performPageination() {
         progressBar.setVisibility(VISIBLE);
         retrofit = new Retrofit.Builder()
-                .baseUrl(URL)
+                .baseUrl(MainActivity.URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         CatApi api = retrofit.create(CatApi.class);
@@ -152,7 +149,7 @@ public class Tab1 extends Fragment {
                         Log.d("daniel", "onResponse " + response.body());
                         List<PhotoDTO> responseData = response.body();
 //                        photos.addAll(responseData);
-                        adapter.addImages(responseData);
+                        adapterBreed.addImages(responseData);
 
                     } else {
                         Toast.makeText(getActivity(), "Фото больше нет", Toast.LENGTH_SHORT).show();
@@ -194,6 +191,7 @@ public class Tab1 extends Fragment {
                     for (int i = 0; i < breeds.size(); i++) {
                         if (breeds.get(i).getBreed().equals(selectStringName)) {
                             PhotoDTO.breeds_id = breeds.get(i).getId();
+                            System.out.println(PhotoDTO.breeds_id);
                             break;
                         }
                     }
@@ -214,7 +212,7 @@ public class Tab1 extends Fragment {
 
     public void workServiceListOfSpinner() {
         retrofit = new Retrofit.Builder()
-                .baseUrl(URL)
+                .baseUrl(MainActivity.URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         CatApi api = retrofit.create(CatApi.class);
