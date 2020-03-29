@@ -1,6 +1,5 @@
 package ru.mirea.lab5.api.model;
 
-import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 public class PostGet {
@@ -17,12 +16,20 @@ public class PostGet {
         return id;
     }
 
-
     public String getImageId() {
         return image_id;
     }
 
     public int getValue() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return "PostGet{" +
+                "id= " + id +
+                ", image_id= '" + image_id + '\'' +
+                ", value= " + value +
+                '}';
     }
 }

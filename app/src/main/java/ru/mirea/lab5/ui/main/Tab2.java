@@ -22,9 +22,7 @@ import ru.mirea.lab5.MainActivity;
 import ru.mirea.lab5.R;
 import ru.mirea.lab5.api.CatApi;
 import ru.mirea.lab5.api.model.PhotoDTO;
-import ru.mirea.lab5.api.model.PostCreate;
 import ru.mirea.lab5.api.model.PostGet;
-import ru.mirea.lab5.api.model.PostType;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -33,11 +31,12 @@ public class Tab2 extends Fragment {
     private TextView textView;
     private AdapterFavourites adapterFavourites;
     private RecyclerView recyclerView;
-    private Retrofit retrofit;
     private ArrayList<PostGet> posts;
     private ArrayList<PhotoDTO> photos;
     private GridLayoutManager layoutManager;
     private PhotoDTO flagFavourites;
+    private Retrofit retrofit;
+    private CatApi api;
 
 
     public Tab2() {
@@ -50,6 +49,7 @@ public class Tab2 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab2, container, false);
+        recyclerView.setVisibility(View.INVISIBLE);
         photos.clear();
         posts.clear();
         textView = (TextView) view.findViewById(R.id.tab2_text);
@@ -58,14 +58,15 @@ public class Tab2 extends Fragment {
                 .baseUrl(MainActivity.URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-        CatApi api = retrofit.create(CatApi.class);
+        api = retrofit.create(CatApi.class);
         api.getVotes(MainActivity.USER_ID).enqueue(new retrofit2.Callback<List<PostGet>>() {
             @Override
             public void onResponse(retrofit2.Call<List<PostGet>> call, retrofit2.Response<List<PostGet>> response) {
                 if (response.isSuccessful()) {
                     Log.d("daniel", "lastLike " + response.body());
                     List<PostGet> responseData = response.body();
-                    posts.addAll(responseData);
+                    posts = new ArrayList<PostGet> (responseData);
+                    getPhotos();
                 }
             }
 
@@ -74,6 +75,10 @@ public class Tab2 extends Fragment {
                 t.printStackTrace();
             }
         });
+        return view;
+    }
+
+    public void getPhotos() {
         for (int i = 0, j = 0; i < posts.size() && j < 10; i++) {
             if (posts.get(i).getValue() == 1) {
                 j++;
@@ -83,6 +88,7 @@ public class Tab2 extends Fragment {
                         if (response.isSuccessful()) {
                             Log.d("History", "onResponse " + response.body());
                             photos.add(response.body());
+                            createRecyclerView();
                         }
                     }
 
@@ -93,8 +99,11 @@ public class Tab2 extends Fragment {
                 });
             }
         }
+    }
+
+    private void createRecyclerView() {
         if (photos.size() != 0) {
-            textView.setText(R.string.tab_text_2);
+            textView.setText(R.string.last_like);
             layoutManager = new GridLayoutManager(getActivity(), 2);
             recyclerView.setLayoutManager(layoutManager);
             adapterFavourites = new AdapterFavourites(getActivity(), photos);
@@ -102,10 +111,10 @@ public class Tab2 extends Fragment {
             recyclerView.setVisibility(View.VISIBLE);
         }
         else {
-            textView.setText(R.string.last_like);
-            recyclerView.setVisibility(View.GONE);
+            textView.setText(R.string.tab_text_2);
+            recyclerView.setVisibility(View.INVISIBLE);
         }
-        return view;
+
     }
 
 }

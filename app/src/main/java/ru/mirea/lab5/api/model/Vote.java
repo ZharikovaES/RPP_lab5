@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 
 public class Vote {
     @SerializedName("id")
-    @Expose
     private int id;
 
     public Vote(int vote_id) {

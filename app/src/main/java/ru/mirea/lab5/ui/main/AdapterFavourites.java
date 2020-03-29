@@ -29,7 +29,7 @@ public class AdapterFavourites extends RecyclerView.Adapter<AdapterFavourites.It
         @NonNull
         @Override
         public AdapterFavourites.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.tab1_item, parent, false);
             return new ItemViewHolder(v);
         }
 

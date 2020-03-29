@@ -16,16 +16,15 @@ public class PhotoDTO {
     private int iid;
 
     @SerializedName("url")
-    @Expose
-    private String imageUrl;
+    private String url;
 
     public PhotoDTO(String imageUrl, int isLike) {
-        this.imageUrl = imageUrl;
+        this.url = imageUrl;
         this.isLike = isLike;
     }
 
     public String getImageUrl() {
-        return imageUrl;
+        return url;
     }
     public static int getPageCount() {
         pageCount = (int)Math.ceil(imagesCount / limit);
@@ -33,10 +32,9 @@ public class PhotoDTO {
     }
 
     public String getImageId() {
-        System.out.println(imageUrl);
-        int pos1 = imageUrl.lastIndexOf("/");
-        int pos2 = imageUrl.lastIndexOf(".");
-        String s = imageUrl.substring(pos1 + 1, pos2);
+        int pos1 = url.lastIndexOf("/");
+        int pos2 = url.lastIndexOf(".");
+        String s = url.substring(pos1 + 1, pos2);
         return s;
     }
 

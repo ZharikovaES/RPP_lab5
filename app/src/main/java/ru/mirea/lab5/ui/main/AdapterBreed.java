@@ -54,16 +54,15 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
             @Override
             public void onResponse(retrofit2.Call<List<PostGet>> call, retrofit2.Response<List<PostGet>> response) {
                 if (response.isSuccessful()) {
-                    System.out.println("PostsF " + response.body() + " " + response.code());
+//                    System.out.println("PostsF " + response.body() + " " + response.code());
                     arrayPostFavourites = response.body();
-                    for (int i = 0; i < list.size(); i++) {
-                        for (int j = 0; j < arrayPostFavourites.size(); j++) {
-                            if (list.get(i).getImageId().equals(arrayPostFavourites.get(j).getImageId())) {
-                                list.get(i).setLike(arrayPostFavourites.get(j).getValue());
-                                System.out.println("Есть контакт");
-                            }
-                        }
-                    }
+//                    for (int i = 0; i < list.size(); i++) {
+//                        for (int j = 0; j < arrayPostFavourites.size(); j++) {
+//                            if (list.get(i).getImageId().equals(arrayPostFavourites.get(j).getImageId())) {
+//                                list.get(i).setLike(arrayPostFavourites.get(j).getValue());
+//                            }
+//                        }
+//                    }
                 }
             }
 
@@ -72,6 +71,10 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                 t.printStackTrace();
             }
         });
+        for (int i = 0; i < arrayPostFavourites.size(); i++) {
+            System.out.println("Есть контакт: " + arrayPostFavourites.get(i).toString());
+        }
+        System.out.println("Size: " + arrayPostFavourites.size());
     }
 
     @Override
@@ -83,7 +86,7 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
     @NonNull
     @Override
     public ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.tab1_item, parent, false);
         return new ItemViewHolder(v);
     }
 
@@ -97,7 +100,7 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                 .centerCrop()
                 .placeholder(R.drawable.icon)
                 .into(viewHolder.imageView);
-
+        System.out.println("Bind: " + arrayPostFavourites.size());
         for (int j = 0; j < arrayPostFavourites.size(); j++) {
             if (list.get(position).getImageId().equals(arrayPostFavourites.get(j).getImageId())) {
                 list.get(position).setLike(arrayPostFavourites.get(j).getValue());
@@ -117,8 +120,8 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                         @Override
                         public void onResponse(Call<Vote> call, Response<Vote> response) {
                             if (response.isSuccessful()) {
-                                System.out.println("Лайк отправлен!!! " + response.code() +
-                                        Integer.toString(response.body().getVote_id()));
+                                System.out.println("Лайк отправлен!!! " + response.code() + " "
+                                        + response.body().getVote_id());
                                 Toast.makeText(context, "Лайк поставлен", Toast.LENGTH_SHORT).show();
                                 list.get(position).setId(response.body().getVote_id());
 
@@ -134,12 +137,12 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                  else if (list.get(position).isLike() == 1) {
                     list.get(position).setLike(-1);
                     postCreate.setValue(-1);
-                    Call<Void> call = api.delVote(Integer.toString(list.get(position).getId()));
+                    Call<Void> call = api.delVote(list.get(position).getId());
                     call.enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
                             if (response.isSuccessful()) {
-                                Log.d("daniel", "onResponse робит1 " + response.message());
+                                Log.d("daniel", "onResponse робит1 " + response.code());
                                 Toast.makeText(context, "Лайк убран", Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -180,12 +183,12 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                     // возвращаем первую картинку
                     list.get(position).setLike(-1);
                     postCreate.setValue(-1);
-                    Call<Void> call = api.delVote(Integer.toString(list.get(position).getId()));
+                    Call<Void> call = api.delVote(list.get(position).getId());
                     call.enqueue(new Callback<Void>() {
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
                             if (response.isSuccessful()) {
-                                Log.d("daniel", "onResponse робит1 " + response.message());
+                                Log.d("daniel", "onResponse робит2 " + response.message());
                                 Toast.makeText(context, "Дизлайк убран", Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -224,9 +227,9 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
 
         public ItemViewHolder(@NonNull View itemView) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.item_image);
-            imageButton_like = itemView.findViewById(R.id.item_image_bottom_like);
-            imageButton_dislike = itemView.findViewById(R.id.item_image_bottom_dislike);
+            imageView = itemView.findViewById(R.id.tab1_item_image);
+            imageButton_like = itemView.findViewById(R.id.tab1_item_image_bottom_like);
+            imageButton_dislike = itemView.findViewById(R.id.tab1_item_image_bottom_dislike);
         }
 
     }

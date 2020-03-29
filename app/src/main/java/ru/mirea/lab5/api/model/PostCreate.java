@@ -9,11 +9,9 @@ public class PostCreate {
 //    private String id;
 
     @SerializedName("image_id")
-    @Expose
     private String image_id;
 
     @SerializedName("sub_id")
-    @Expose
     private String sub_id;
 
     @SerializedName("value")
