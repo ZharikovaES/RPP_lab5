@@ -50,6 +50,8 @@ public class Tab2 extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tab2, container, false);
+        photos.clear();
+        posts.clear();
         textView = (TextView) view.findViewById(R.id.tab2_text);
         recyclerView = (RecyclerView) view.findViewById(R.id.tab2_recycle_view);
         retrofit = new Retrofit.Builder()
@@ -61,7 +63,7 @@ public class Tab2 extends Fragment {
             @Override
             public void onResponse(retrofit2.Call<List<PostGet>> call, retrofit2.Response<List<PostGet>> response) {
                 if (response.isSuccessful()) {
-                    Log.d("daniel", "lastLike " + response.code());
+                    Log.d("daniel", "lastLike " + response.body());
                     List<PostGet> responseData = response.body();
                     posts.addAll(responseData);
                 }
@@ -101,6 +103,7 @@ public class Tab2 extends Fragment {
         }
         else {
             textView.setText(R.string.last_like);
+            recyclerView.setVisibility(View.GONE);
         }
         return view;
     }
