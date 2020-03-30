@@ -24,12 +24,13 @@ public class AdapterFavourites extends RecyclerView.Adapter<AdapterFavourites.It
         public AdapterFavourites(Context context, List<PhotoDTO> arrayPhotoDTO) {
             this.context = context;
             this.list = arrayPhotoDTO;
+            System.out.println("array " + arrayPhotoDTO.size());
         }
 
         @NonNull
         @Override
         public AdapterFavourites.ItemViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.tab1_item, parent, false);
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.tab2_item, parent, false);
             return new ItemViewHolder(v);
         }
 
@@ -44,7 +45,6 @@ public class AdapterFavourites extends RecyclerView.Adapter<AdapterFavourites.It
                     .centerCrop()
                     .placeholder(R.drawable.icon)
                     .into(viewHolder.imageView);
-
         }
 
 
@@ -58,7 +58,7 @@ public class AdapterFavourites extends RecyclerView.Adapter<AdapterFavourites.It
 
             public ItemViewHolder(@NonNull View itemView) {
                 super(itemView);
-                imageView = itemView.findViewById(R.id.item_image);
+                imageView = itemView.findViewById(R.id.tab2_item_image);
             }
 
         }

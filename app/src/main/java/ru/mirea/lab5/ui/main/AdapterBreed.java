@@ -14,9 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
 import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,13 +25,11 @@ import ru.mirea.lab5.R;
 import ru.mirea.lab5.api.CatApi;
 import ru.mirea.lab5.api.model.PhotoDTO;
 import ru.mirea.lab5.api.model.PostCreate;
-import ru.mirea.lab5.api.model.PostGet;
 import ru.mirea.lab5.api.model.Vote;
 
 public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHolder> {
     private Context context;
     private List<PhotoDTO> list;
-    private  List<PostGet> arrayPostFavourites;
     private final int VIEW_TYPE_ITEM = 0, VIEW_TYPE_LOADING = 1;
     private ItemViewHolder viewHolder;
     private Retrofit retrofit;
@@ -43,38 +39,11 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
     public AdapterBreed(Context context, List<PhotoDTO> arrayPhotoDTO) {
         this.context = context;
         this.list = arrayPhotoDTO;
-        this.arrayPostFavourites = new ArrayList<PostGet>();
         retrofit = new Retrofit.Builder()
                 .baseUrl(MainActivity.URL)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         api = retrofit.create(CatApi.class);
-
-        api.getVotes(MainActivity.USER_ID).enqueue(new retrofit2.Callback<List<PostGet>>() {
-            @Override
-            public void onResponse(retrofit2.Call<List<PostGet>> call, retrofit2.Response<List<PostGet>> response) {
-                if (response.isSuccessful()) {
-//                    System.out.println("PostsF " + response.body() + " " + response.code());
-                    arrayPostFavourites = response.body();
-//                    for (int i = 0; i < list.size(); i++) {
-//                        for (int j = 0; j < arrayPostFavourites.size(); j++) {
-//                            if (list.get(i).getImageId().equals(arrayPostFavourites.get(j).getImageId())) {
-//                                list.get(i).setLike(arrayPostFavourites.get(j).getValue());
-//                            }
-//                        }
-//                    }
-                }
-            }
-
-            @Override
-            public void onFailure(retrofit2.Call<List<PostGet>> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-        for (int i = 0; i < arrayPostFavourites.size(); i++) {
-            System.out.println("Есть контакт: " + arrayPostFavourites.get(i).toString());
-        }
-        System.out.println("Size: " + arrayPostFavourites.size());
     }
 
     @Override
@@ -100,31 +69,21 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                 .centerCrop()
                 .placeholder(R.drawable.icon)
                 .into(viewHolder.imageView);
-        System.out.println("Bind: " + arrayPostFavourites.size());
-        for (int j = 0; j < arrayPostFavourites.size(); j++) {
-            if (list.get(position).getImageId().equals(arrayPostFavourites.get(j).getImageId())) {
-                list.get(position).setLike(arrayPostFavourites.get(j).getValue());
-            }
-        }
         final PostCreate postCreate = new PostCreate(MainActivity.USER_ID, list.get(position).getImageId());
 
         holder.imageButton_like.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // меняем изображение на кнопке
                 if (list.get(position).isLike() == -1 || list.get(position).isLike() == 0) {
                     list.get(position).setLike(1);
-//                    Log.d("daniel", "onResponse " + currentItem.getUrl());
                     postCreate.setValue(1);
                     Call<Vote> call = api.setPostFavourites(postCreate);
                     call.enqueue(new Callback<Vote>() {
                         @Override
                         public void onResponse(Call<Vote> call, Response<Vote> response) {
                             if (response.isSuccessful()) {
-                                System.out.println("Лайк отправлен!!! " + response.code() + " "
-                                        + response.body().getVote_id());
+                                System.out.println("Лайк отправлен " + response.code());
                                 Toast.makeText(context, "Лайк поставлен", Toast.LENGTH_SHORT).show();
                                 list.get(position).setId(response.body().getVote_id());
-
                             }
                         }
 
@@ -142,7 +101,7 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
                             if (response.isSuccessful()) {
-                                Log.d("daniel", "onResponse робит1 " + response.code());
+                                Log.d("daniel", "Лайк убран " + response.code());
                                 Toast.makeText(context, "Лайк убран", Toast.LENGTH_SHORT).show();
                             }
                         }
@@ -157,17 +116,15 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
         });
         holder.imageButton_dislike.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // меняем изображение на кнопке
                 if (list.get(position).isLike() == -1 || list.get(position).isLike() == 1) {
                     list.get(position).setLike(0);
-//                    Log.d("daniel", "onResponse " + currentItem.getUrl());
                     postCreate.setValue(0);
                     Call<Vote> call = api.setPostFavourites(postCreate);
                     call.enqueue(new Callback<Vote>() {
                         @Override
                         public void onResponse(Call<Vote> call, Response<Vote> response) {
                             if (response.isSuccessful()) {
-                                System.out.println("Дизлайк отправлен!!! " + response.code() + response.body().getVote_id());
+                                System.out.println("Дизлайк отправлен " + response.code());
                                 Toast.makeText(context, "Дизлайк поставлен", Toast.LENGTH_SHORT).show();
                                 list.get(position).setId(response.body().getVote_id());
                             }
@@ -180,7 +137,6 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                     });
                 }
                 else if (list.get(position).isLike() == 0) {
-                    // возвращаем первую картинку
                     list.get(position).setLike(-1);
                     postCreate.setValue(-1);
                     Call<Void> call = api.delVote(list.get(position).getId());
@@ -188,7 +144,7 @@ public class AdapterBreed extends RecyclerView.Adapter<AdapterBreed.ItemViewHold
                         @Override
                         public void onResponse(Call<Void> call, Response<Void> response) {
                             if (response.isSuccessful()) {
-                                Log.d("daniel", "onResponse робит2 " + response.message());
+                                Log.d("daniel", "Дизайк убран " + response.code());
                                 Toast.makeText(context, "Дизлайк убран", Toast.LENGTH_SHORT).show();
                             }
                         }

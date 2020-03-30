@@ -1,6 +1,7 @@
 package ru.mirea.lab5.ui.main;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -30,6 +31,7 @@ import ru.mirea.lab5.R;
 import ru.mirea.lab5.api.CatApi;
 import ru.mirea.lab5.api.model.BreedDTO;
 import ru.mirea.lab5.api.model.PhotoDTO;
+import ru.mirea.lab5.api.model.PostGet;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -48,22 +50,20 @@ public class Tab1 extends Fragment {
     private ArrayList<PhotoDTO> photos;
     private ProgressBar progressBar;
     private GridLayoutManager layoutManager;
+    private CatApi api;
 
     private int pager_number = 0;
     private int item_count = 10;
     private boolean isLoading = true;
     private int pastVisibleItems, totalItemCount, visibleItemCount, previousTotal = 0;
     private int viewThreshold = 10;
+    private ArrayAdapter<String> adapterArr;
+    private Headers headers;
 
 
     public Tab1() {
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        breeds = new ArrayList<>();
         photos = new ArrayList<>();
+        breeds = new ArrayList<>();
     }
 
     @Override
@@ -74,32 +74,29 @@ public class Tab1 extends Fragment {
         selection = (TextView) view.findViewById(R.id.selection);
         progressBar = (ProgressBar) view.findViewById(R.id.progress_bar);
         recyclerView = (RecyclerView) view.findViewById(R.id.tab1_recycle_view);
+        retrofit = new Retrofit.Builder()
+                .baseUrl(MainActivity.URL)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        api = retrofit.create(CatApi.class);
         workServiceListOfSpinner();
         return view;
     }
+
 
     public void createRecyclerView() {
         recyclerView.setHasFixedSize(true);
         layoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerView.setLayoutManager(layoutManager);
         PhotoDTO.limit = Double.valueOf(item_count);
-        retrofit = new Retrofit.Builder()
-                .baseUrl(MainActivity.URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        CatApi api = retrofit.create(CatApi.class);
         api.getPhotoForBreed(PhotoDTO.breeds_id, item_count, "desc", pager_number).enqueue(new retrofit2.Callback<List<PhotoDTO>>() {
             @Override
             public void onResponse(retrofit2.Call<List<PhotoDTO>> call, retrofit2.Response<List<PhotoDTO>> response) {
                 if (response.isSuccessful()) {
                     Log.d("daniel", "onResponse " + response.body());
-                    List<PhotoDTO> responseData = response.body();
-                    Headers headers = response.headers();
-                    PhotoDTO.imagesCount = Double.parseDouble(headers.get("pagination-count"));
-                    photos.addAll(responseData);
-                    adapterBreed = new AdapterBreed(getActivity(), photos);
-                    recyclerView.setAdapter(adapterBreed);
-                    recyclerView.setVisibility(View.VISIBLE);
+                    PhotoDTO.imagesCount = Double.parseDouble(response.headers().get("pagination-count"));
+                    photos.addAll(response.body());
+                    searchLikes();
                 }
             }
 
@@ -132,25 +129,45 @@ public class Tab1 extends Fragment {
         });
     }
 
+    private void searchLikes() {
+        api.getVotes(MainActivity.USER_ID).enqueue(new retrofit2.Callback<List<PostGet>>() {
+            @Override
+            public void onResponse(retrofit2.Call<List<PostGet>> call, retrofit2.Response<List<PostGet>> response) {
+                if (response.isSuccessful()) {
+                    List<PostGet> arrayPostFavourites = response.body();
+                    for (int i = 0; i < photos.size(); i++) {
+                        for (int j = 0; j < arrayPostFavourites.size(); j++) {
+                            if (photos.get(i).getImageId().equals(arrayPostFavourites.get(j).getImageId())) {
+                                photos.get(i).setLike(arrayPostFavourites.get(j).getValue());
+                                photos.get(i).setId(arrayPostFavourites.get(j).getId());
+                            }
+                        }
+                    }
+                    adapterBreed = new AdapterBreed(getActivity(), photos);
+                    recyclerView.setAdapter(adapterBreed);
+                    recyclerView.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onFailure(retrofit2.Call<List<PostGet>> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+
+    }
+
     private void performPageination() {
         progressBar.setVisibility(VISIBLE);
-        retrofit = new Retrofit.Builder()
-                .baseUrl(MainActivity.URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        CatApi api = retrofit.create(CatApi.class);
-        api.getPhotoForBreed(PhotoDTO.breeds_id, item_count,"desc", pager_number).enqueue(new retrofit2.Callback<List<PhotoDTO>>() {
+        api.getPhotoForBreed(PhotoDTO.breeds_id, item_count, "desc", pager_number).enqueue(new retrofit2.Callback<List<PhotoDTO>>() {
             @Override
             public void onResponse(retrofit2.Call<List<PhotoDTO>> call, retrofit2.Response<List<PhotoDTO>> response) {
                 if (response.isSuccessful()) {
-                    if (pager_number  < PhotoDTO.getPageCount()) {
-                        Log.d("daniel", "onResponse " + response.body());
+                    if (pager_number < PhotoDTO.getPageCount()) {
                         List<PhotoDTO> responseData = response.body();
-//                        photos.addAll(responseData);
                         adapterBreed.addImages(responseData);
-
                     } else {
-                        Toast.makeText(getActivity(), "Фото больше нет", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), "Контента больше нет", Toast.LENGTH_SHORT).show();
                     }
                     recyclerView.setVisibility(View.VISIBLE);
                 }
@@ -172,7 +189,7 @@ public class Tab1 extends Fragment {
         for (int i = 0; i < array.size(); i++) {
             arrayList[i + 1] = array.get(i).getBreed();
         }
-        ArrayAdapter<String> adapterArr = new ArrayAdapter<String>(getActivity(),
+        adapterArr = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_spinner_item, arrayList);
         adapterArr.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapterArr);
@@ -183,7 +200,6 @@ public class Tab1 extends Fragment {
                 pager_number = 0;
                 previousTotal = 0;
                 isLoading = true;
-                // Получаем выбранный объект
                 selectStringName = (String) parent.getItemAtPosition(position);
                 if (!selectStringName.equals("Породы")) {
                     for (int i = 0; i < breeds.size(); i++) {
@@ -192,10 +208,9 @@ public class Tab1 extends Fragment {
                             break;
                         }
                     }
-//                    progressBar.setVisibility(VISIBLE);
                     createRecyclerView();
                 } else {
-                    recyclerView.setVisibility(View.INVISIBLE);
+                    recyclerView.setVisibility(GONE);
                 }
                 selection.setText(selectStringName);
             }
@@ -208,18 +223,11 @@ public class Tab1 extends Fragment {
     }
 
     public void workServiceListOfSpinner() {
-        retrofit = new Retrofit.Builder()
-                .baseUrl(MainActivity.URL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        CatApi api = retrofit.create(CatApi.class);
         api.getBreeds().enqueue(new retrofit2.Callback<List<BreedDTO>>() {
             @Override
             public void onResponse(retrofit2.Call<List<BreedDTO>> call, retrofit2.Response<List<BreedDTO>> response) {
                 if (response.isSuccessful()) {
-                    Log.d("daniel", "onResponse " + response.body());
-                    List<BreedDTO> responseData = response.body();
-                    createSpinner((ArrayList<BreedDTO>) responseData);
+                    createSpinner((ArrayList<BreedDTO>) response.body());
                 }
             }
 

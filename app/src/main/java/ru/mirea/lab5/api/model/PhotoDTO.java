@@ -1,12 +1,15 @@
 package ru.mirea.lab5.api.model;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PhotoDTO {
+public class PhotoDTO implements Parcelable {
     public static Double imagesCount = 1.0;
     public static Double limit = 0.0;
     private static int pageCount = 1;
@@ -53,4 +56,28 @@ public class PhotoDTO {
     public void setId(int id) {
         this.iid = id;
     }
-}
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(url);
+        dest.writeInt(iid);
+    }
+
+    public static final Creator<PhotoDTO> CREATOR = new Creator<PhotoDTO>() {
+        @Override
+        public PhotoDTO createFromParcel(Parcel source) {
+            String u = source.readString();
+            int i = source.readInt();
+            return new PhotoDTO(u, i);
+        }
+
+        @Override
+        public PhotoDTO[] newArray(int size) {
+            return new PhotoDTO[size];
+        }
+    };}

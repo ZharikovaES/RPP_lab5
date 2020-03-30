@@ -7,12 +7,14 @@
 
     <TextView
         android:id="@+id/selection"
+        android:text="@string/breeds"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp" />
 
     <Spinner
         android:id="@+id/breeds"
+        android:text="@string/breeds"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="20dp"
