@@ -14,7 +14,7 @@ public class MainActivity extends AppCompatActivity {
     private ViewPager viewPager;
     private TabItem tab1, tab2;
     private SectionsPagerAdapter pagerAdapter;
-    public final static String USER_ID ="your-user-1234";
+    public final static String USER_ID ="user4358497563948543";
     public final static String URL = "https://api.thecatapi.com/v1/";
 
 
